@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: flask-app
-        image: <Account-ID>.dkr.ecr.us-east-1.amazonaws.com/allianz-demo-repo:green
+        image: 339713079894.dkr.ecr.us-east-1.amazonaws.com/allianz-demo-repo:green
         ports:
         - containerPort: 5000
         readinessProbe:
