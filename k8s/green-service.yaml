@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: green-service
+  labels:
+    app: flask-app
+    version: v2
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 5000
+  selector:
+    app: flask-app
+    version: v2

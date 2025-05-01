@@ -1,0 +1,62 @@
+name: Blue-Green Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: 339713079894.dkr.ecr.us-east-1.amazonaws.com/allianz-demo-repo
+  EKS_CLUSTER: allianz-demo-cluster
+  BLUE_TAG: blue
+  GREEN_TAG: green
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Configure AWS Credentials
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build Blue Image
+        run: |
+          docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.BLUE_TAG }} -f ./app/v1/Dockerfile ./app
+          docker push ${{ env.ECR_REPOSITORY }}:${{ env.BLUE_TAG }}
+
+      - name: Deploy Blue
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
+          kubectl apply -f k8s/blue-deployment.yaml
+          kubectl apply -f k8s/blue-service.yaml
+          kubectl rollout status deployment/flask-blue --timeout=90s
+          kubectl apply -f k8s/alb-ingress-blue.yaml
+          echo "Blue deployment complete and traffic routed to Blue"
+
+      - name: Build Green Image
+        run: |
+          docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.GREEN_TAG }} -f ./app/v2/Dockerfile ./app
+          docker push ${{ env.ECR_REPOSITORY }}:${{ env.GREEN_TAG }}
+
+      - name: Deploy Green
+        run: |
+          kubectl apply -f k8s/green-deployment.yaml
+          kubectl apply -f k8s/green-service.yaml
+          kubectl rollout status deployment/flask-green --timeout=90s
+          echo "Green deployment complete (not receiving traffic yet)"
+
+      # # Switch Traffic to Green
+      # - name: Shift Traffic to Green
+      #   run: |
+      #     kubectl apply -f k8s/alb-ingress-green.yaml
+      #     echo "Traffic switched to Green deployment"
+      #     kubectl get ingress -o wide

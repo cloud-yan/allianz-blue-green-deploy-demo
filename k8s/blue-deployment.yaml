@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-blue
+  labels:
+    app: flask-app
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flask-app
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: flask-app
+        version: v1
+    spec:
+      containers:
+      - name: flask-app
+        image: <Account-ID>.dkr.ecr.us-east-1.amazonaws.com/allianz-demo-repo:blue
+        ports:
+        - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
