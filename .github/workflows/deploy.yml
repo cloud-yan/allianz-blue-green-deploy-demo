@@ -54,9 +54,9 @@ jobs:
           kubectl rollout status deployment/flask-green --timeout=90s
           echo "Green deployment complete (not receiving traffic yet)"
 
-      # # Switch Traffic to Green
-      # - name: Shift Traffic to Green
-      #   run: |
-      #     kubectl apply -f k8s/alb-ingress-green.yaml
-      #     echo "Traffic switched to Green deployment"
-      #     kubectl get ingress -o wide
+      # Switch Traffic to Green
+      - name: Shift Traffic to Green
+        run: |
+          kubectl apply -f k8s/alb-ingress-green.yaml
+          echo "Traffic switched to Green deployment"
+          kubectl get ingress -o wide
