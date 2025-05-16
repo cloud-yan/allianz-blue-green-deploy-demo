@@ -5,7 +5,7 @@
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker)
 
-A production-ready implementation of zero-downtime deployments using Blue-Green strategy on Amazon EKS.
+A implementation of zero-downtime deployments using Blue-Green strategy on Amazon EKS.
 
 ## 🌟 Key Features
 
