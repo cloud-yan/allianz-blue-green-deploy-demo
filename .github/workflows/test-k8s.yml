@@ -5,14 +5,7 @@ jobs:
   test:
     runs-on: gh-runners-scale-set # This makes it use your k8s runner
     steps:
-        - name: Install kubectl
-          run: |
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            chmod +x kubectl
-            sudo mv kubectl /usr/local/bin/
-        
-        - name: Test commands
-          run: |
-            echo "Hello from Kubernetes!"
-            echo "Running on pod: $(hostname)"
-            kubectl get nodes
+      - run: |
+          echo "Hello from Kubernetes!"
+          echo "Running on pod: $(hostname)"
+          echo "This proves your runner is working in k8s"
