@@ -2,12 +2,12 @@ name: Blue-Green Deployment
 
 on:
   push:
-    branches: [ main ]
+    branches: [ gh-runners-scale-set ]
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: 339713079894.dkr.ecr.us-east-1.amazonaws.com/allianz-demo-repo
-  EKS_CLUSTER: allianz-demo-cluster
+  ECR_REPOSITORY: 381492100137.dkr.ecr.us-east-1.amazonaws.com/allianz-demo-repo
+  EKS_CLUSTER: demo-cluster
   BLUE_TAG: blue
   GREEN_TAG: green
 
@@ -55,8 +55,8 @@ jobs:
           echo "Green deployment complete (not receiving traffic yet)"
 
       # Switch Traffic to Green
-      - name: Shift Traffic to Green
-        run: |
-          kubectl apply -f k8s/alb-ingress-green.yaml
-          echo "Traffic switched to Green deployment"
-          kubectl get ingress -o wide
+      # - name: Shift Traffic to Green
+      #   run: |
+      #     kubectl apply -f k8s/alb-ingress-green.yaml
+      #     echo "Traffic switched to Green deployment"
+      #     kubectl get ingress -o wide
