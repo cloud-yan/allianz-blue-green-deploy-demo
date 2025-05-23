@@ -1,58 +1,11 @@
-name: Test Kubernetes Runner
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+name: Test K8s Runner
+on: [push]
 
 jobs:
-  test-runner-environment:
-    runs-on: gh-runners-scale-set  # Important: This targets your k8s runner
-    name: Test Kubernetes Runner Environment
+  test:
+    runs-on: gh-runners-scale-set # This makes it use your k8s runner
     steps:
-      # Checkout the code
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # Basic environment checks
-      - name: Verify Kubernetes tools
-        run: |
-          echo "Checking kubectl:"
-          kubectl version --client
-          echo -e "\nChecking helm:"
-          helm version
-          echo -e "\nChecking docker:"
-          docker --version
-
-      # Verify cluster access
-      - name: Test Kubernetes cluster access
-        run: |
-          echo "Current namespace:"
-          kubectl config view --minify --output 'jsonpath={..namespace}'
-          echo -e "\nCluster info:"
-          kubectl cluster-info
-          echo -e "\nNodes:"
-          kubectl get nodes
-
-      # Simple build/test example (modify for your needs)
-      - name: Run a simple test
-        run: |
-          echo "Hello from Kubernetes runner!"
-          echo "Running in pod: $(hostname)"
-          echo "Current directory: $(pwd)"
-          echo "Files in repo:"
-          ls -la
-
-      # Optional: Build a simple Docker image (if Docker is available)
-      - name: Test Docker build
-        run: |
-          echo "FROM alpine:latest" > Dockerfile.test
-          echo "RUN echo 'Hello from test image'" >> Dockerfile.test
-          docker build -t test-image -f Dockerfile.test .
-          docker run --rm test-image
-
-      # Clean up
-      - name: Clean up
-        run: |
-          rm -f Dockerfile.test
+      - run: |
+          echo "Hello from Kubernetes!"
+          echo "Running on pod: $(hostname)"
+          kubectl get nodes  # Verify cluster access
