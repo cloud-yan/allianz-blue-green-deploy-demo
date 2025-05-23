@@ -28,10 +28,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Blue Image
-        run: |
-          docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.BLUE_TAG }} -f ./app/v1/Dockerfile ./app
-          docker push ${{ env.ECR_REPOSITORY }}:${{ env.BLUE_TAG }}
+      # - name: Build Blue Image
+      #   run: |
+      #     docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.BLUE_TAG }} -f ./app/v1/Dockerfile ./app
+      #     docker push ${{ env.ECR_REPOSITORY }}:${{ env.BLUE_TAG }}
 
       - name: Deploy Blue
         run: |
@@ -42,10 +42,10 @@ jobs:
           kubectl apply -f k8s/alb-ingress-blue.yaml
           echo "Blue deployment complete and traffic routed to Blue"
 
-      - name: Build Green Image
-        run: |
-          docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.GREEN_TAG }} -f ./app/v2/Dockerfile ./app
-          docker push ${{ env.ECR_REPOSITORY }}:${{ env.GREEN_TAG }}
+      # - name: Build Green Image
+      #   run: |
+      #     docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.GREEN_TAG }} -f ./app/v2/Dockerfile ./app
+      #     docker push ${{ env.ECR_REPOSITORY }}:${{ env.GREEN_TAG }}
 
       - name: Deploy Green
         run: |
