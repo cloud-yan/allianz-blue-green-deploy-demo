@@ -2,7 +2,7 @@ name: Blue-Green Deployment
 
 on:
   push:
-    branches: [ gh-runners-scale-set ]
+    branches: [ main ]
 
 env:
   AWS_REGION: us-east-1
@@ -13,7 +13,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: gh-runners-scale-set
     steps:
       - uses: actions/checkout@v2
 
