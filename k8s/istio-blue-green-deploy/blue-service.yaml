@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue-service
+  labels:
+    app: flask-app
+    version: v1
+    service.istio.io/canonical-name: flask-app
+spec:
+  # type: NodePort
+  ports:
+  - port: 80
+    targetPort: 5000
+  selector:
+    app: flask-app
+    version: v1

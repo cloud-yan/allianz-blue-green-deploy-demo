@@ -5,7 +5,7 @@
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker)
 
-A production-ready implementation of zero-downtime deployments using Blue-Green strategy on Amazon EKS.
+A implementation of zero-downtime deployments using Blue-Green strategy on Amazon EKS.
 
 ## 🌟 Key Features
 
@@ -21,12 +21,20 @@ A production-ready implementation of zero-downtime deployments using Blue-Green 
 - `kubectl`, `awscli`, `eksctl`, and `helm` installed
 - Docker runtime
 
-## 🚀 Quick Start
+## 🚀 Demo Infra Setup
+
+### Prerequisites
+
+- AWS CLI installed and configured with proper permissions
+
+- AWS account with permissions to create ECR repositories
+
+- Docker CLI installed
 
 ### 1. Cluster Setup
 
 ```bash
-eksctl create cluster --name allianz-demo-cluster --region us-east-1 --node-type t3.medium
+eksctl create cluster --name demo-cluster --region us-east-1 --node-type t3.medium
 ```
 
 ### 2. ALB Controller Installation
@@ -35,10 +43,10 @@ eksctl create cluster --name allianz-demo-cluster --region us-east-1 --node-type
 # 1. Create OIDC provider
 eksctl utils associate-iam-oidc-provider \
     --region us-east-1 \
-    --cluster allianz-demo-cluster \
+    --cluster demo-cluster \
     --approve
 
-# 2. Create IAM Policy
+# 2. Create and Attach IAM Policy
 curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
 
 aws iam create-policy \
@@ -47,7 +55,7 @@ aws iam create-policy \
 
 # 3. Create IAM service account
 eksctl create iamserviceaccount \
-  --cluster=allianz-demo-cluster \
+  --cluster=demo-cluster \
   --namespace=kube-system \
   --name=aws-load-balancer-controller \
   --attach-policy-arn=arn:aws:iam::<Account-ID>:policy/AWSLoadBalancerControllerIAMPolicy \
@@ -56,14 +64,58 @@ eksctl create iamserviceaccount \
 
 # 4. Install controller
 helm repo add eks https://aws.github.io/eks-charts
+
+helm repo update
+
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   -n kube-system \
-  --set clusterName=allianz-demo-cluster \
+  --set clusterName=demo-cluster \
   --set serviceAccount.create=false \
   --set serviceAccount.name=aws-load-balancer-controller
 ```
 
-### 3. Configure GitHub Secrets
+### 3. ECR Setup
+
+1. Create ECR Repo
+
+```bash
+aws ecr create-repository \
+  --repository-name <your-repo-name> \
+  --image-tag-mutability MUTABLE \
+  --tags Key=Project,Value=MyApp
+```
+
+2. Login to ECR (for later use)
+
+```bash
+aws ecr get-login-password | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.<your-region>.amazonaws.com
+```
+
+### 4. Docker Image Build
+
+1. Blue App (V1)
+
+```dockercommand
+docker build -t <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/demo-repo:blue -f ./app/v1/Dockerfile ./app
+
+docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/demo-repo:blue
+```
+
+2. Green App (V2)
+
+```dockercommand
+docker build -t <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/demo-repo:green -f ./app/v2/Dockerfile ./app
+
+docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/demo-repo:green
+```
+
+### 5. Deploy K8s Manifests
+
+```k8s
+kubectl apply -f ./k8s/
+```
+
+### 4. Configure GitHub Secrets
 
 Set these in your repo settings:
 

@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flask-blue
+  name: flask-green
   labels:
     app: flask-app
-    version: v1
+    version: v2
 spec:
   replicas: 3
   selector:
     matchLabels:
       app: flask-app
-      version: v1
+      version: v2
   template:
     metadata:
       labels:
         app: flask-app
-        version: v1
+        version: v2
     spec:
       containers:
         - name: flask-app
-          image: 339713079894.dkr.ecr.us-east-1.amazonaws.com/allianz-demo-repo:blue
-          imagePullPolicy: IfNotPresent
+          image: 211125585429.dkr.ecr.us-east-1.amazonaws.com/demo-repo:green
+          # imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

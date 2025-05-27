@@ -5,6 +5,8 @@ metadata:
   labels:
     app: flask-app
     version: v2
+    service.istio.io/canonical-name: flask-app
+    service.istio.io/canonical-revision: v2
 spec:
   replicas: 3
   selector:
@@ -19,14 +21,7 @@ spec:
     spec:
       containers:
         - name: flask-app
-          image: 339713079894.dkr.ecr.us-east-1.amazonaws.com/allianz-demo-repo:green
-          imagePullPolicy: IfNotPresent
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            readOnlyRootFilesystem: true
+          image: 339712983001.dkr.ecr.us-east-1.amazonaws.com/demo-repo:green
           ports:
             - containerPort: 5000
           readinessProbe:
